@@ -7,12 +7,17 @@ import allure
 
 class OrderPage(BasePage):
     ORDER_TITLE = (
-        By.CSS_SELECTOR, "h1.order-page__title"
-    )
+        By.CSS_SELECTOR, "h1.order-page__title")
     ORDER_PAGE_URL = "https://shop.mts.ru/personal/order/"
 
     def __init__(self, driver: Chrome):
         super().__init__(driver)
+
+    @allure.step("Ожидание загрузки страницы заказа")
+    def wait_for_page_to_load(self) -> None:
+        self.wait.until(
+            EC.url_contains(self.ORDER_PAGE_URL)
+        )
 
     @allure.step("Проверяем страницу перехода")
     def is_order_page(self) -> bool:

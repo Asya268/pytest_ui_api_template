@@ -1,6 +1,7 @@
 from selenium.webdriver.common.by import By
 from pages.base import BasePage
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 import allure
 
 
@@ -10,6 +11,18 @@ class RecipientPage(BasePage):
     PHONE_INPUT = (By.ID, "user-phone")
     EMAIL_INPUT = (By.ID, "user-email")
     SUBMIT_BUTTON = (By.CSS_SELECTOR, ".button.button--primary")
+
+    @allure.step("Ожидание загрузки страницы получателя")
+    def wait_for_page_to_load(self):
+        WebDriverWait(self.driver, 30).until(
+            EC.presence_of_element_located(self.FIRST_NAME_INPUT)
+        )
+        WebDriverWait(self.driver, 30).until(
+            EC.visibility_of_element_located(self.FIRST_NAME_INPUT)
+        )
+        WebDriverWait(self.driver, 30).until(
+            EC.element_to_be_clickable(self.FIRST_NAME_INPUT)
+        )
 
     @allure.step("Заполнение информации о получателе")
     def fill_recipient_info(
@@ -32,7 +45,7 @@ class RecipientPage(BasePage):
         with allure.step("Заполнение поля email"):
             self.wait.until(
                 EC.presence_of_element_located(
-                    self.EMAIL_INPUT)).send_keys(email)
+                    self.EMAIL_INPUT)).send_keys(email)    
 
     @allure.step("Отправка формы")
     def click_submit_button(self):

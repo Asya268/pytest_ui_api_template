@@ -49,13 +49,10 @@ def test_full_purchase_process(driver: Chrome,
         search_page.add_to_basket()
         basket_page = BasketPage(driver)
 
-        # Простая проверка суммы заказа
         with allure.step("Проверка общей суммы заказа"):
             total_price = basket_page.get_total_price()
             allure.attach(f"Полученная сумма: {total_price}",
                           name="Проверка суммы")
-
-            # Минимальная валидация: сумма не пустая и содержит цифры
             assert total_price, "Сумма заказа не должна быть пустой"
             assert any(char.isdigit() for char in total_price), \
                 "Сумма заказа должна содержать цифры"
@@ -71,13 +68,7 @@ def test_full_purchase_process(driver: Chrome,
 
     with allure.step("Шаг 7: Переход на страницу данных получателя"):
         recipient_page = RecipientPage(driver)
-    WebDriverWait(driver, 30).until(
-        EC.presence_of_element_located(RecipientPage.FIRST_NAME_INPUT))
-    WebDriverWait(driver, 30).until(
-        EC.visibility_of_element_located(RecipientPage.FIRST_NAME_INPUT))
-    WebDriverWait(driver, 30).until(
-        EC.element_to_be_clickable(RecipientPage.FIRST_NAME_INPUT))
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        recipient_page.wait_for_page_to_load()
 
     with allure.step("Шаг 8: Заполнение данных получателя"):
         recipient_page.fill_recipient_info(
@@ -90,9 +81,7 @@ def test_full_purchase_process(driver: Chrome,
 
     with allure.step("Шаг 9: Проверка перехода на страницу заказа"):
         order_page = OrderPage(driver)
-
-        WebDriverWait(driver, 30).until(
-            lambda driver: order_page.ORDER_PAGE_URL in driver.current_url)
-    assert order_page.is_order_page()
-    order_title = order_page.get_order_title()
-    assert "оформлен" in order_title.lower()
+        order_page.wait_for_page_to_load()
+        assert order_page.is_order_page()
+        order_title = order_page.get_order_title()
+        assert "оформлен" in order_title.lower()
